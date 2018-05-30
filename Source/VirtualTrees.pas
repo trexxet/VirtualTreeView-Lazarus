@@ -28283,7 +28283,7 @@ begin
 
   if not Assigned(lNode) then
   begin
-    Exit(nil);
+    Exit(T(nil));
   end;
 
   Result := T(Self.GetNodeData(lNode)^);
