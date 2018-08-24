@@ -203,6 +203,7 @@ begin
   begin
     FExtensionsInitialized := True;
     FExtensionList := TStringList.Create;
+    FExtensionList.Sorted := True;
     {$ifdef GraphicEx}
       FileFormatList.GetExtensionList(FExtensionList);
       for I := 0 to FExtensionList.Count - 1 do
@@ -219,7 +220,6 @@ begin
       //Add('.emf');
     end;
     {$endif}
-    FExtensionList.Sort;
   end;
 
   Ext := ExtractFileExt(Name);
