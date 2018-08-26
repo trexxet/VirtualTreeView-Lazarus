@@ -5279,7 +5279,9 @@ var
 begin
   P := Point(X, Y);
   LPtoDP(Canvas.Handle, P, 1);
+  {$ifndef INCOMPLETE_WINAPI}
   SetBrushOrgEx(Canvas.Handle, P.X, P.Y, nil);
+  {$endif}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -22185,7 +22187,7 @@ begin
   else // No MultiSelect, hence we can start a drag anywhere in the row.
     FullRowDrag := toFullRowDrag in FOptions.FMiscOptions;
 
-  IsHeightTracking := (Message.Msg = WM_LBUTTONDOWN) and
+  IsHeightTracking := (Message.Msg = LM_LBUTTONDOWN) and
                       (hiOnItem in HitInfo.HitPositions) and
                       ([hiUpperSplitter, hiLowerSplitter] * HitInfo.HitPositions <> []);
 
@@ -30114,8 +30116,10 @@ begin
               end;
 
               // Set the origin of the canvas' brush. This depends on the node heights.
+              {$ifndef INCOMPLETE_WINAPI}
               with PaintInfo do
                 SetBrushOrigin(Canvas, BrushOrigin.X, BrushOrigin.Y);
+              {$endif}
 
               CurrentNodeHeight := PaintInfo.Node.NodeHeight;
               R.Bottom := CurrentNodeHeight;
