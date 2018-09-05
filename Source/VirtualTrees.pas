@@ -4434,6 +4434,19 @@ begin
   InternalClipboardFormats.Add(Description, TreeClass, Priority, FormatEtc);
 end;
 
+//----------------- compatibility functions ----------------------------------------------------------------------------
+
+// ExcludeClipRect is buggy in Cocoa
+// https://github.com/blikblum/VirtualTreeView-Lazarus/issues/8
+// https://bugs.freepascal.org/view.php?id=34196
+
+{$ifdef LCLCocoa}
+function ExcludeClipRect(dc: hdc; Left, Top, Right, Bottom : Integer) : Integer;
+begin
+  Result := 0;
+end;
+{$endif}
+
 //----------------- utility functions ----------------------------------------------------------------------------------
 
 procedure ShowError(Msg: String; HelpContext: Integer);
