@@ -357,7 +357,7 @@ const
     {$define Gtk}
   {$endif}
 
-  {$if defined(Gtk)}
+  {$if defined(Gtk) or defined(LCLCocoa)}
     {$define ManualClipNeeded}
   {$endif}
 
@@ -28643,7 +28643,7 @@ begin
                 {$ifdef DEBUG_VTV}Logger.SendBitmap([lcPaintBitmap],'NodeBitmap ' + IntToStr(PaintInfo.Node^.Index), NodeBitmap);{$endif}
                 {$ifdef DEBUG_VTV}Logger.SendIf([lcPaintDetails, lcHeaderOffset],'TargetRect.Top < Target.Y '+ Logger.RectToStr(TargetRect)
                   +'  '+Logger.PointToStr(Target),TargetRect.Top < Target.Y);{$endif}
-                {$ifdef Gtk}
+                {$ifdef ManualClipNeeded}
                 //lclheader
                 // This is a brute force fix AKA hack to prevent the header being cleared
                 // when the tree is scrolled (YOffset < 0) and the mouse is over the header
