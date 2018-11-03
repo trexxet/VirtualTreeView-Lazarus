@@ -1,6 +1,6 @@
 unit virtualpanningwindow;
 
-{Adapted from VirtualTrees by Luiz Américo to work in LCL/Lazarus}
+{Adapted from VirtualTrees by Luiz AmÃ©rico to work in LCL/Lazarus}
 
 {$mode objfpc}{$H+}
 
@@ -75,7 +75,7 @@ end;
 procedure TVirtualPanningWindow.Start(OwnerHandle: THandle; const Position: TPoint);
 var
   TempClass: TWndClass;
-  lSize: TSize;
+  Size: TSize;
 begin
   // Register the helper window class.
   if not GetClassInfo(HInstance, PanningWindowClass.lpszClassName, TempClass) then
