@@ -85,11 +85,11 @@ begin
   end;
   
   // Create the helper window and show it at the given position without activating it.
-  lSize.CX := MulDiv(32, ScreenInfo.PixelsPerInchX, 96);
-  lSize.CY := MulDiv(32, ScreenInfo.PixelsPerInchY, 96);
+  Size.CX := MulDiv(32, ScreenInfo.PixelsPerInchX, 96);
+  Size.CY := MulDiv(32, ScreenInfo.PixelsPerInchY, 96);
   with Position do
     FHandle := CreateWindowEx(WS_EX_TOOLWINDOW, PanningWindowClass.lpszClassName,
-      nil, WS_POPUP, X - lSize.CX div 2, Y - lSize.CY div 2, lSize.CX, lSize.CY,
+      nil, WS_POPUP, X - Size.CX div 2, Y - Size.CY div 2, Size.CX, Size.CY,
       OwnerHandle, 0, HInstance, nil);
   //todo use SetWindowLongPtr later
   SetWindowLong(FHandle,GWL_USERDATA,PtrInt(Self));

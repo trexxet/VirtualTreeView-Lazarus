@@ -1272,7 +1272,8 @@ type
     FSortDolumn: TColumnIndex;
     {$IF LCL_FullVersion >= 2000000}
     FImagesWidth: Integer;
-    {$IFEND}    FSortColumn: TColumnIndex;
+    {$IFEND}
+    FSortColumn: TColumnIndex;
     FSortDirection: TSortDirection;
     FDragImage: TVTDragImage;          // drag image management during header drag
     FLastWidth: Integer;               // Used to adjust spring columns. This is the width of all visible columns,
@@ -3040,8 +3041,8 @@ type
     function GetRealCheckImagesWidth: Integer;
     function GetRealCheckImagesHeight: Integer;
     {$IF LCL_FullVersion >= 1080000}
-    procedure DoAutoAdjustLayout(const AMode: TLayoutAdjustmentPolicy;
-      const AXProportion, AYProportion: Double); override;
+    procedure DoAutoAdjustLayout(const Mode: TLayoutAdjustmentPolicy;
+      const XProportion, YProportion: Double); override;
     {$IFEND}
 
   // LCL multi-resolution imagelist support
@@ -5232,11 +5233,11 @@ begin
 end;
 {$IFEND}
 
-function BuildResourceName(AResName: String): String;
+function BuildResourceName(ResourceName: String): String;
 var
   percent: Integer;
 begin
-  Result := AResName;
+  Result := ResourceName;
   {$IF LCL_FullVersion >= 2000000}
   percent := GetScalePercent;
   if percent = 150 then
@@ -14328,6 +14329,7 @@ begin
           begin
             Brush.Color := clBlack;
             Pen.Color := clBlack;
+            // todo: evaluate RTL triangle coordinates
             if BiDiMode = bdLeftToRight then
               Polygon([Point(p1, p8-p1), Point(p8-p1, p8-p1), Point(p8-p1, p1)])
             else
@@ -22085,66 +22087,84 @@ end;
 
 function TBaseVirtualTree.GetRealImagesWidth: Integer;
 begin
-  {$IF LCL_FullVersion >= 2000000}
-  Result := FImages.ResolutionForPPI[FImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Width;
-  {$ELSE}
-  Result := FImages.Width;
-  {$IFEND}
+  if FImages = nil then
+    Result := 0
+  else
+    {$IF LCL_FullVersion >= 2000000}
+    Result := FImages.ResolutionForPPI[FImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Width;
+    {$ELSE}
+    Result := FImages.Width;
+    {$IFEND}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
 function TBaseVirtualTree.GetRealImagesHeight: Integer;
 begin
-  {$IF LCL_FullVersion >= 2000000}
-  Result := FImages.ResolutionForPPI[FImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Height;
-  {$ELSE}
-  Result := FImages.Height;
-  {$IFEND}
+  if FImages = nil then
+    Result := 0
+  else
+    {$IF LCL_FullVersion >= 2000000}
+    Result := FImages.ResolutionForPPI[FImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Height;
+    {$ELSE}
+    Result := FImages.Height;
+    {$IFEND}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
 function TBaseVirtualTree.GetRealStateImagesWidth: Integer;
 begin
-  {$IF LCL_FullVersion >= 2000000}
-  Result := FStateImages.ResolutionForPPI[FStateImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Width;
-  {$ELSE}
-  Result := FStateImages.Width;
-  {$IFEND}
+  if FStateImages = nil then
+    Result := 0
+  else
+    {$IF LCL_FullVersion >= 2000000}
+    Result := FStateImages.ResolutionForPPI[FStateImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Width;
+    {$ELSE}
+    Result := FStateImages.Width;
+    {$IFEND}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
 function TBaseVirtualTree.GetRealStateImagesHeight: Integer;
 begin
-  {$IF LCL_FullVersion >= 2000000}
-  Result := FStateImages.ResolutionForPPI[FStateImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Height;
-  {$ELSE}
-  Result := FStateImages.Height;
-  {$IFEND}
+  if FStateImages = nil then
+    Result := 0
+  else
+    {$IF LCL_FullVersion >= 2000000}
+    Result := FStateImages.ResolutionForPPI[FStateImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Height;
+    {$ELSE}
+    Result := FStateImages.Height;
+    {$IFEND}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
 function TBaseVirtualTree.GetRealCheckImagesWidth: Integer;
 begin
-  {$IF LCL_FullVersion >= 2000000}
-  Result := FCheckImages.ResolutionForPPI[FCheckImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Width;
-  {$ELSE}
-  Result := FCheckImages.Width;
-  {$IFEND}
+  if FCheckImages = nil then
+    Result := 0
+  else
+    {$IF LCL_FullVersion >= 2000000}
+    Result := FCheckImages.ResolutionForPPI[FCheckImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Width;
+    {$ELSE}
+    Result := FCheckImages.Width;
+    {$IFEND}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
 function TBaseVirtualTree.GetRealCheckImagesHeight: Integer;
 begin
-  {$IF LCL_FullVersion >= 2000000}
-  Result := FCheckImages.ResolutionForPPI[FCheckImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Height;
-  {$ELSE}
-  Result := FCheckImages.Height;
-  {$IFEND}
+  if FCheckImages = nil then
+    Result := 0
+  else
+    {$IF LCL_FullVersion >= 2000000}
+    Result := FCheckImages.ResolutionForPPI[FCheckImagesWidth, Font.PixelsPerInch, GetCanvasScaleFactor].Height;
+    {$ELSE}
+    Result := FCheckImages.Height;
+    {$IFEND}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -24197,15 +24217,15 @@ var
   {$endif}
   UseThemes: Boolean;
   DrawEffect: TGraphicsDrawEffect;
-  checkSize: Integer;
+  CheckSize: Integer;
 
 begin
   {$ifdef DEBUG_VTV}Logger.EnterMethod([lcCheck],'PaintCheckImage');{$endif}
 
   {$if LCL_FullVersion >= 1080000}
-  checkSize := Scale96ToFont(DEFAULT_CHECK_WIDTH);
+  CheckSize := Scale96ToFont(DEFAULT_CHECK_WIDTH);
   {$else}
-  checkSize := DEFAULT_CHECK_WIDTH;
+  CheckSize := DEFAULT_CHECK_WIDTH;
   {$ifend}
 
   with ImageInfo do
@@ -24216,8 +24236,8 @@ begin
       if UseThemes then
       begin
         Details := ThemeServices.GetElementDetails(tbCheckBoxCheckedNormal);
-        checkSize := ThemeServices.GetDetailSize(Details).CX;
-        R := Rect(XPos, YPos, XPos + checkSize, YPos + checkSize);
+        CheckSize := ThemeServices.GetDetailSize(Details).CX;
+        R := Rect(XPos, YPos, XPos + CheckSize, YPos + CheckSize);
         Details.Element := teButton;
         case Index of
           0..8: // radio buttons
@@ -24255,7 +24275,7 @@ begin
       end
       else
       begin
-        R := Rect(XPos + 1, YPos + 1, XPos + checkSize-2, YPos + checkSize-2);
+        R := Rect(XPos + 1, YPos + 1, XPos + CheckSize-2, YPos + CheckSize-2);
         DrawCheckButton(Canvas, Index - 1, R, FCheckImageKind = ckSystemFlat);
       end;
     end
@@ -25186,7 +25206,7 @@ const
 
 var
   ImageName: string;
-  bm: TCustomBitmap;
+  Bitmap: TCustomBitmap;
 
 begin
   // Set both panning and scrolling flag. One will be removed shortly depending on whether the middle mouse button is
@@ -25213,15 +25233,15 @@ begin
   else
     ImageName := 'VT_MOVENS_BMP';
 
-  bm := CreateBitmapFromResourceName(0, BuildResourceName(ImageName));  // is png!
+  Bitmap := CreateBitmapFromResourceName(0, BuildResourceName(ImageName));  // is png!
   try
-    FPanningWindow.Image.SetSize(bm.Width, bm.Height);
+    FPanningWindow.Image.SetSize(Bitmap.Width, Bitmap.Height);
     FPanningWindow.Image.Canvas.Brush.Color := TRANSPARENT_COLOR;
-    FPanningWindow.Image.Canvas.FillRect(0, 0, bm.Width, bm.Height);
+    FPanningWindow.Image.Canvas.FillRect(0, 0, Bitmap.Width, Bitmap.Height);
     FPanningWindow.Image.Transparent := true;
-    FPanningWindow.Image.Canvas.Draw(0, 0, bm);
+    FPanningWindow.Image.Canvas.Draw(0, 0, Bitmap);
   finally
-    bm.Free;
+    Bitmap.Free;
   end;
 
   FPanningWindow.Show(CreateClipRegion);
@@ -26764,29 +26784,29 @@ end;
 //----------------------------------------------------------------------------------------------------------------------
 
 {$IF LCL_FullVersion >= 1080000}
-procedure TBaseVirtualTree.DoAutoAdjustLayout(const AMode: TLayoutAdjustmentPolicy;
-  const AXProportion, AYProportion: Double);
+procedure TBaseVirtualTree.DoAutoAdjustLayout(const Mode: TLayoutAdjustmentPolicy;
+  const XProportion, YProportion: Double);
 begin
   inherited;
-  if AMode in [lapAutoAdjustWithoutHorizontalScrolling, lapAutoAdjustForDPI] then
+  if Mode in [lapAutoAdjustWithoutHorizontalScrolling, lapAutoAdjustForDPI] then
   begin
     DisableAutoSizing;
     try
       if IsDefaultNodeHeightStored then
-        FDefaultNodeHeight := Round(FDefaultNodeHeight * AYProportion);
+        FDefaultNodeHeight := Round(FDefaultNodeHeight * YProportion);
       if IsIndentStored then
-        FIndent := Round(FIndent * AYProportion);
+        FIndent := Round(FIndent * YProportion);
       if IsMarginStored then
-        FMargin := Round(FMargin * AXProportion);
+        FMargin := Round(FMargin * XProportion);
       if IsTextMarginStored then
-        FTextMargin := Round(FTextMargin * AXProportion);
+        FTextMargin := Round(FTextMargin * XProportion);
       if IsSelectionCurveRadiusStored then
-        FSelectionCurveRadius := Round(FSelectionCurveRadius * AXProportion);
+        FSelectionCurveRadius := Round(FSelectionCurveRadius * XProportion);
       if IsDragHeightStored then
-        FDragHeight := Round(FDragHeight * AYProportion);
+        FDragHeight := Round(FDragHeight * YProportion);
       if IsDragWidthStored then
-        FDragWidth := Round(FDragWidth * AXProportion);
-      FHeader.AutoAdjustLayout(AXProportion, AYProportion);
+        FDragWidth := Round(FDragWidth * XProportion);
+      FHeader.AutoAdjustLayout(XProportion, YProportion);
     finally
       EnableAutoSizing;
     end;
