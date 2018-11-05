@@ -1,6 +1,6 @@
 unit virtualpanningwindow;
 
-{Adapted from VirtualTrees by Luiz Américo to work in LCL/Lazarus}
+{Adapted from VirtualTrees by Luiz AmÃ©rico to work in LCL/Lazarus}
 
 {$mode objfpc}{$H+}
 
@@ -75,6 +75,7 @@ end;
 procedure TVirtualPanningWindow.Start(OwnerHandle: THandle; const Position: TPoint);
 var
   TempClass: TWndClass;
+  Size: TSize;
 begin
   // Register the helper window class.
   if not GetClassInfo(HInstance, PanningWindowClass.lpszClassName, TempClass) then
@@ -84,9 +85,12 @@ begin
   end;
   
   // Create the helper window and show it at the given position without activating it.
+  Size.CX := MulDiv(32, ScreenInfo.PixelsPerInchX, 96);
+  Size.CY := MulDiv(32, ScreenInfo.PixelsPerInchY, 96);
   with Position do
-    FHandle := CreateWindowEx(WS_EX_TOOLWINDOW, PanningWindowClass.lpszClassName, nil, WS_POPUP, X - 16, Y - 16,
-      32, 32, OwnerHandle, 0, HInstance, nil);
+    FHandle := CreateWindowEx(WS_EX_TOOLWINDOW, PanningWindowClass.lpszClassName,
+      nil, WS_POPUP, X - Size.CX div 2, Y - Size.CY div 2, Size.CX, Size.CY,
+      OwnerHandle, 0, HInstance, nil);
   //todo use SetWindowLongPtr later
   SetWindowLong(FHandle,GWL_USERDATA,PtrInt(Self));
   

@@ -69,7 +69,7 @@ unit VTHeaderPopup;
 interface
 
 uses
-  Menus, VirtualTrees;
+  Menus, LCLVersion, VirtualTrees;
 
 type
   TVTHeaderPopupOption = (
@@ -191,7 +191,11 @@ begin
     if poResizeToFitItem in Self.Options then begin
       NewMenuItem := NewItem(sResizeToFit, 0, False, True, OnMenuItemClick, 0, cResizeToFitMenuItemName);
       Items.Add(NewMenuItem);
+      {$IF LCL_FullVersion >= 2000000}
+      Items.Add(NewLineMI());
+      {$ELSE}
       Items.Add(NewLine());
+      {$IFEND}
     end;//poResizeToFitItem
 
     // Add column menu items.
