@@ -4751,6 +4751,16 @@ begin
 end;
 {$endif}
 
+// LCLIntf.BitBlt is not compatible with windows.BitBlt
+// The former takes into account the alpha channel while the later not
+
+{$if not defined(USE_DELPHICOMPAT) and defined(LCLWin)}
+function BitBlt(DestDC: HDC; X, Y, Width, Height: Integer; SrcDC: HDC; XSrc, YSrc: Integer; Rop: DWORD): Boolean;
+begin
+  Result := windows.BitBlt(DestDC, X, Y, Width, Height, SrcDC, XSrc, YSrc, Rop);
+end;
+{$endif}
+
 //----------------- utility functions ----------------------------------------------------------------------------------
 
 procedure ShowError(const Msg: String; HelpContext: Integer);
