@@ -1269,7 +1269,6 @@ type
     FFixedAreaConstraints: TVTFixedAreaConstraints; // Percentages for the fixed area (header, fixed columns).
     FImages: TCustomImageList;
     FImageChangeLink: TChangeLink;     // connections to the image list to get notified about changes
-    FSortDolumn: TColumnIndex;
     {$IF LCL_FullVersion >= 2000000}
     FImagesWidth: Integer;
     {$IFEND}
@@ -5234,16 +5233,16 @@ begin
 end;
 {$IFEND}
 
-function BuildResourceName(ResourceName: String): String;
+function BuildResourceName(const ResourceName: String): String;
 var
-  percent: Integer;
+  Percent: Integer;
 begin
   Result := ResourceName;
   {$IF LCL_FullVersion >= 2000000}
-  percent := GetScalePercent;
-  if percent = 150 then
+  Percent := GetScalePercent;
+  if Percent = 150 then
     Result := Result + '_150'
-  else if percent <> 100 then
+  else if Percent <> 100 then
     Result := Result + '_200';
   {$IFEND}
 end;
@@ -5251,24 +5250,24 @@ end;
 //----------------------------------------------------------------------------------------------------------------------
 
 // Support resources with bmp as well as png
-procedure LoadBitmapFromResource(ABitmap: TBitmap; AResName: String);
+procedure LoadBitmapFromResource(Bitmap: TBitmap; const ResourceName: String);
 var
-  bm: TCustomBitmap;
+  ResourceBitmap: TCustomBitmap;
 begin
-  bm := CreateBitmapFromResourceName(0, BuildResourceName(AResName));
+  ResourceBitmap := CreateBitmapFromResourceName(0, BuildResourceName(ResourceName));
   try
-    bm.Transparent := true;
-    ABitmap.Assign(bm);
+    ResourceBitmap.Transparent := True;
+    Bitmap.Assign(ResourceBitmap);
   finally
-    bm.Free;
+    ResourceBitmap.Free;
   end;
 end;
 
 function CreateCheckImageList(CheckKind: TCheckImageKind): TImageList;
 {$IF LCL_FullVersion >= 2000000}
 var
-  bm: TCustomBitmap;
-  resName: String;
+  Bitmap: TCustomBitmap;
+  ResourceName: String;
 {$ENDIF}
 begin
   Result := TImageList.Create(nil);
@@ -5276,14 +5275,14 @@ begin
   Result.Width := 16;
   {$IF LCL_FullVersion >= 2000000}
   Result.RegisterResolutions([16, 24, 32]);
-  Result.Scaled := true;
-  resname := BuildResourceName(CheckImagesStrings[CheckKind]);
-  bm := CreateBitmapFromResourceName(0, resname);
+  Result.Scaled := True;
+  Resourcename := BuildResourceName(CheckImagesStrings[CheckKind]);
+  Bitmap := CreateBitmapFromResourceName(0, ResourceName);
   try
-    bm.Transparent := true;
-    Result.AddSliced(bm, 25, 1);
+    Bitmap.Transparent := True;
+    Result.AddSliced(Bitmap, 25, 1);
   finally
-    bm.Free;
+    Bitmap.Free;
   end;
   {$ELSE}
   Result.AddResourceName(0, CheckImagesStrings[CheckKind], clFuchsia);
