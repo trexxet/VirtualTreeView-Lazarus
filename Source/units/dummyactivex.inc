@@ -1,4 +1,5 @@
-
+{$warnings off}
+{$hints off}
 
 {fake unit just to compile - not used under non windows}
 
@@ -262,7 +263,9 @@ type
    Function GetDataHere(CONST pformatetc : FormatETC; Out medium : STGMEDIUM):HRESULT; STDCALL;
    Function QueryGetData(const pformatetc : FORMATETC):HRESULT; STDCALL;
    Function GetCanonicalFormatEtc(const pformatetcIn : FORMATETC;Out pformatetcOut : FORMATETC):HResult; STDCALl;
-   Function SetData (Const pformatetc : FORMATETC;const medium:STGMEDIUM;FRelease : BOOL):HRESULT; StdCall;
+   Function SetData (Const pformatetc : FORMATETC;
+     {$IF FPC_FullVersion >= 30200}var{$else}const{$IFEND} medium:STGMEDIUM;
+     FRelease : BOOL):HRESULT; StdCall;
    Function EnumFormatEtc(dwDirection : DWord; OUT enumformatetcpara : IENUMFORMATETC):HRESULT; StdCall;
    Function DAdvise(const formatetc : FORMATETC;advf :DWORD; CONST AdvSink : IAdviseSink;OUT dwConnection:DWORD):HRESULT;StdCall;
    Function DUnadvise(dwconnection :DWord) :HRESULT;StdCall;
