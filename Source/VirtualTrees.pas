@@ -251,7 +251,7 @@ var // Clipboard format IDs used in OLE drag'n drop and clipboard transfers.
   CF_VRTFNOOBJS,   // Unfortunately CF_RTF* is already defined as being
                    // registration strings so I have to use different identifiers.
   CF_HTML,
-  CF_CSV: Word;
+  CF_CSV: TClipboardFormat;
 
   MMXAvailable: Boolean; // necessary to know because the blend code uses MMX instructions
   IsWinVistaOrAbove: Boolean;
@@ -711,7 +711,7 @@ type
 
   // OLE drag'n drop support
   TFormatEtcArray = array of TFormatEtc;
-  TFormatArray = array of Word;
+  TFormatArray = array of TClipboardFormat;
 
   // IDataObject.SetData support
   TInternalStgMedium = packed record
@@ -3545,7 +3545,7 @@ type
     destructor Destroy(); override;
     function AddChild(Parent: PVirtualNode; UserData: Pointer = nil): PVirtualNode; override;
     function ComputeNodeHeight(Canvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; S: String = ''): Integer; virtual;
-    function ContentToClipboard(Format: Word; Source: TVSTTextSourceType): HGLOBAL;
+    function ContentToClipboard(Format: TClipboardFormat; Source: TVSTTextSourceType): HGLOBAL;
     procedure ContentToCustom(Source: TVSTTextSourceType);
     function ContentToHTML(Source: TVSTTextSourceType; const Caption: String = ''): String;
     function ContentToRTF(Source: TVSTTextSourceType): AnsiString;
@@ -4082,8 +4082,8 @@ type
 // OLE Clipboard and drag'n drop helper
 procedure EnumerateVTClipboardFormats(TreeClass: TVirtualTreeClass; const List: TStrings); overload;
 procedure EnumerateVTClipboardFormats(TreeClass: TVirtualTreeClass; var Formats: TFormatEtcArray); overload;
-function GetVTClipboardFormatDescription(AFormat: Word): string;
-procedure RegisterVTClipboardFormat(AFormat: Word; TreeClass: TVirtualTreeClass; Priority: Cardinal); overload;
+function GetVTClipboardFormatDescription(AFormat: TClipboardFormat): string;
+procedure RegisterVTClipboardFormat(AFormat: TClipboardFormat; TreeClass: TVirtualTreeClass; Priority: Cardinal); overload;
 function RegisterVTClipboardFormat(Description: string; TreeClass: TVirtualTreeClass; Priority: Cardinal;
   tymed: Integer = TYMED_HGLOBAL; ptd: PDVTargetDevice = nil; dwAspect: Integer = DVASPECT_CONTENT;
   lindex: Integer = -1): Word; overload;
@@ -4390,8 +4390,8 @@ type
       const AllowedFormats: TClipboardFormats = nil); overload;
     procedure EnumerateFormats(TreeClass: TVirtualTreeClass; const Formats: TStrings); overload;
     function FindFormat(FormatString: string): PClipboardFormatListEntry; overload;
-    function FindFormat(FormatString: string; var Fmt: Word): TVirtualTreeClass; overload;
-    function FindFormat(Fmt: Word; out Description: string): TVirtualTreeClass; overload;
+    function FindFormat(FormatString: string; var Fmt: TClipboardFormat): TVirtualTreeClass; overload;
+    function FindFormat(Fmt: TClipboardFormat; out Description: string): TVirtualTreeClass; overload;
   end;
 
 var
@@ -4572,7 +4572,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TClipboardFormatList.FindFormat(FormatString: string; var Fmt: Word): TVirtualTreeClass;
+function TClipboardFormatList.FindFormat(FormatString: string; var Fmt: TClipboardFormat): TVirtualTreeClass;
 
 var
   I: Integer;
@@ -4594,7 +4594,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function TClipboardFormatList.FindFormat(Fmt: Word; out Description: string): TVirtualTreeClass;
+function TClipboardFormatList.FindFormat(Fmt: TClipboardFormat; out Description: string): TVirtualTreeClass;
 
 var
   I: Integer;
@@ -4667,7 +4667,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function GetVTClipboardFormatDescription(AFormat: Word): string;
+function GetVTClipboardFormatDescription(AFormat: TClipboardFormat): string;
 
 begin
   if InternalClipboardFormats = nil then
@@ -4678,7 +4678,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure RegisterVTClipboardFormat(AFormat: Word; TreeClass: TVirtualTreeClass; Priority: Cardinal);
+procedure RegisterVTClipboardFormat(AFormat: TClipboardFormat; TreeClass: TVirtualTreeClass; Priority: Cardinal);
 
 // Registers the given clipboard format for the given TreeClass.
 
@@ -12235,7 +12235,7 @@ function TClipboardFormats.Add(const S: string): Integer;
 // ancestors.
 
 var
-  Format: Word;
+  Format: TClipboardFormat;
   RegisteredClass: TVirtualTreeClass;
 
 begin
@@ -12254,7 +12254,7 @@ procedure TClipboardFormats.Insert(Index: Integer; const S: string);
 // ancestors.
 
 var
-  Format: Word;
+  Format: TClipboardFormat;
   RegisteredClass: TVirtualTreeClass;
 
 begin
