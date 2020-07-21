@@ -6134,6 +6134,8 @@ begin
               DoPaintText(Node, Self.Canvas, Column, ttNormal);
           //force the default hint font color
           Canvas.Font.Color := Screen.HintFont.Color;
+          if Canvas.Font.Color = clDefault then
+            Canvas.Font.Color := clInfoText;
         end;
 
         //let THintWindow do the job
@@ -8331,7 +8333,7 @@ begin
     else
       TextColor := FHeader.Treeview.FColors.HeaderFontColor;
     if TextColor = clDefault then
-      TextColor := clBtnText;
+      TextColor := FHeader.Treeview.GetDefaultColor(dctFont);
     SetTextColor(DC, ColorToRGB(TextColor));
     DrawText(DC, PChar(Caption), Length(Caption), Bounds, DrawFormat);
   end;
@@ -9521,8 +9523,13 @@ var
               ColImageInfo.Index := GetCheckImage(nil, FCheckType, FCheckState, IsEnabled);
               ColImageInfo.XPos := GlyphPos.X;
               ColImageInfo.YPos := GlyphPos.Y;
+              if ColImageInfo.Images <> nil then begin
               w := ColImageInfo.Images.Width;
               h := ColImageInfo.Images.Height;
+              end else begin
+                w := 0;
+                h := 0;
+              end;
               PaintCheckImage(TargetCanvas, ColImageInfo, False);
             end;
           end;
@@ -9627,6 +9634,9 @@ begin
     // Use shortcuts for the images and the font.
     Images := FHeader.FImages;
     Font := FHeader.FFont;
+    if Font.Color = clDefault then
+      Font.Color := FHeader.Treeview.GetDefaultColor(dctFont);
+
     {$IF LCL_FullVersion >= 2000000}
     if Images <> nil then
       ImagesRes := Images.ResolutionForPPI[FHeader.ImagesWidth, Font.PixelsPerInch, Header.TreeView.GetCanvasScaleFactor];
@@ -14480,9 +14490,11 @@ begin
   end;
 
   {$ifdef ThemeSupport}
-  //  if Theme <> 0 then
-  //    CloseThemeData(Theme);
+  {$ifdef Windows}
+    if tsUseThemes in FStates then
+      CloseThemeData(Theme);
   {$endif}
+  {$endif ThemeSupport}
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -22765,7 +22777,7 @@ begin
   else // No MultiSelect, hence we can start a drag anywhere in the row.
     FullRowDrag := toFullRowDrag in FOptions.FMiscOptions;
 
-  IsHeightTracking := (Message.Msg = LM_LBUTTONDOWN) and
+  IsHeightTracking := (Message.Msg = WM_LBUTTONDOWN) and
                       (hiOnItem in HitInfo.HitPositions) and
                       ([hiUpperSplitter, hiLowerSplitter] * HitInfo.HitPositions <> []);
 
@@ -24446,10 +24458,10 @@ var
   IsHot: Boolean;
   {$ifdef Windows}
   Theme: HTHEME;
-  {$endif}
   Glyph: Integer;
   State: Integer;
   Pos: TRect;
+  {$endif}
 
 begin
   IsHot := (toHotTrack in FOptions.FPaintOptions) and (FCurrentHotNode = Node) and FHotNodeButtonHit;
@@ -24462,11 +24474,11 @@ begin
 
   if tsUseExplorerTheme in FStates then
   begin
+    {$ifdef Windows}
     Glyph := IfThen(IsHot, TVP_HOTGLYPH, TVP_GLYPH);
     State := IfThen(vsExpanded in Node.States, GLPS_OPENED, GLPS_CLOSED);
     Pos := Rect(XPos, R.Top + ButtonY, XPos + FPlusBM.Width, R.Top + ButtonY + FPlusBM.Height);
     
-    {$ifdef Windows}
     Theme := OpenThemeData(Handle, 'TREEVIEW');
     DrawThemeBackground(Theme, Canvas.Handle, Glyph, State, Pos, nil);
     CloseThemeData(Theme);
@@ -24798,7 +24810,7 @@ begin
             if not IsRectEmpty(InnerRect) then
               {$ifdef ThemeSupport}
               {$ifdef Windows}
-                if Theme <> 0 then
+                if tsUseExplorerTheme in FStates then
                 begin
                   // If the node is also hot, its background will be drawn later.
                   if not (toHotTrack in FOptions.FPaintOptions) or (Node <> FCurrentHotNode) or
@@ -24819,7 +24831,7 @@ begin
 
     {$ifdef ThemeSupport}
     {$ifdef Windows}
-      if (Theme <> 0) and (toHotTrack in FOptions.FPaintOptions) and (Node = FCurrentHotNode) and
+      if (tsUseExplorerTheme in FStates) and (toHotTrack in FOptions.FPaintOptions) and (Node = FCurrentHotNode) and
          ((Column = FCurrentHotColumn) or (toFullRowSelect in FOptions.FSelectionOptions)) then
         DrawBackground(IfThen((vsSelected in Node.States) and not (toAlwaysHideSelection in FOptions.FPaintOptions),
                               TREIS_HOTSELECTED, TREIS_HOT));
@@ -24844,7 +24856,7 @@ begin
         {$ifdef ThemeSupport}
         {$ifdef Windows}
           if not (toExtendedFocus in FOptions.FSelectionOptions) and (toFullRowSelect in FOptions.FSelectionOptions) and
-            (Theme <> 0) then
+            (tsUseExplorerTheme in FStates) then
             FocusRect := RowRect
           else
         {$endif}
@@ -24879,11 +24891,10 @@ begin
     end;
   end;
   {$ifdef ThemeSupport}
-  //todo
-  {
-  if Theme <> 0 then
+  {$ifdef Windows}
+  if tsUseExplorerTheme in FStates then
     CloseThemeData(Theme);
-  }
+  {$endif}
   {$endif ThemeSupport}
 end;
 
@@ -33634,7 +33645,7 @@ begin
       end;
     end;
     if Canvas.Font.Color = clDefault then
-      Canvas.Font.Color := clWindowText;
+      Canvas.Font.Color := GetDefaultColor(dctFont);
   end;
 end;
 
@@ -33748,6 +33759,8 @@ begin
   with PaintInfo do
   begin
     Canvas.Font := Font;
+    if Font.Color = clDefault then
+      Canvas.Font.Color := GetDefaultColor(dctFont);
     if toFullRowSelect in FOptions.FSelectionOptions then
     begin
       if Node = FDropTargetNode then
@@ -33765,6 +33778,8 @@ begin
           else
             Canvas.Font.Color := FColors.NodeFontColor;
         end;
+      if Canvas.Font.Color = clDefault then
+        Canvas.Font.Color := GetDefaultColor(dctFont);
     end;
 
     DrawFormat := DT_NOPREFIX or DT_VCENTER or DT_SINGLELINE;
@@ -34209,6 +34224,7 @@ var
   Done: Boolean;
 
 begin
+  Result := '';
   Done := False;
   if Assigned(FOnShortenString) then
     FOnShortenString(Self, Canvas, Node, Column, S, Width, Result, Done);
