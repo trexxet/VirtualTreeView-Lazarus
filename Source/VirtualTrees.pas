@@ -1020,7 +1020,7 @@ type
     function GetData(const FormatEtcIn: TFormatEtc; out Medium: TStgMedium): HResult; virtual; stdcall;
     function GetDataHere(const FormatEtc: TFormatEtc; out Medium: TStgMedium): HResult; virtual; stdcall;
     function QueryGetData(const FormatEtc: TFormatEtc): HResult; virtual; stdcall;
-    function SetData(const FormatEtc: TFormatEtc; const Medium: TStgMedium; DoRelease: BOOL): HResult; virtual; stdcall;
+    function SetData(const FormatEtc: TFormatEtc; {$IF FPC_FullVersion >= 30200}var{$ELSE}const{$IFEND} Medium: TStgMedium; DoRelease: BOOL): HResult; virtual; stdcall;
   end;
 
   // TVTDragManager is a class to manage drag and drop in a Virtual Treeview.
@@ -7519,12 +7519,12 @@ begin
     if OldPosition < Position then
     begin
       // column will be moved up so move down other entries
-      Move(FPositionToIndex[OldPosition + 1], FPositionToIndex[OldPosition], (Position - OldPosition) * SizeOf(TColumnIndex));
+      System.Move(FPositionToIndex[OldPosition + 1], FPositionToIndex[OldPosition], (Position - OldPosition) * SizeOf(TColumnIndex));
     end
     else
     begin
       // column will be moved down so move up other entries
-      Move(FPositionToIndex[Position], FPositionToIndex[Position + 1], (OldPosition - Position) * SizeOf(TColumnIndex));
+      System.Move(FPositionToIndex[Position], FPositionToIndex[Position + 1], (OldPosition - Position) * SizeOf(TColumnIndex));
     end;
     FPositionToIndex[Position] := Column.Index;
   end;
@@ -7878,7 +7878,7 @@ begin
       begin
         // Index found. Move all higher entries one step down and remove the last entry.
         if I < Upper then
-          Move(FPositionToIndex[I + 1], FPositionToIndex[I], (Upper - I) * SizeOf(TColumnIndex));
+          System.Move(FPositionToIndex[I + 1], FPositionToIndex[I], (Upper - I) * SizeOf(TColumnIndex));
       end;
       // Decrease all indices, which are greater than the index to be deleted.
       if FPositionToIndex[I] > OldIndex then
