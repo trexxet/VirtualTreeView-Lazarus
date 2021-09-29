@@ -13212,13 +13212,13 @@ end;
 function TBaseVirtualTree.PackArray(const TheArray: TNodeArray; Count: Integer): Integer;
 var
   Source, Dest: ^PVirtualNode;
-  ConstOne: PtrInt;
+  ConstOne: PtrUInt;
 begin
   Source := Pointer(TheArray);
   ConstOne := 1;
   Result := 0;
   // Do the fastest scan possible to find the first entry
-  while (Count <> 0) and {not Odd(NativeInt(Source^))} (PtrInt(Source^) and ConstOne = 0) do
+  while (Count <> 0) and {not Odd(NativeInt(Source^))} (PtrUInt(Source^) and ConstOne = 0) do
   begin
     Inc(Result);
     Inc(Source);
@@ -13230,7 +13230,7 @@ begin
     Dest := Source;
     repeat
       // Skip odd entries
-      if {not Odd(NativeInt(Source^))} PtrInt(Source^) and ConstOne = 0 then
+      if {not Odd(NativeInt(Source^))} PtrUInt(Source^) and ConstOne = 0 then
       begin
         Dest^ := Source^;
         Inc(Result);
@@ -20184,7 +20184,7 @@ begin
   while L <= H do
   begin
     I := (L + H) shr 1;
-    C := PtrInt(FSelection[I]) - PtrInt(P);
+    C := PtrUInt(FSelection[I]) - PtrUInt(P);
     if C < 0 then
       L := I + 1
     else
@@ -32254,7 +32254,7 @@ var
     I: Integer;
 
   begin
-    I := Colors.IndexOf(Pointer(Color));
+    I := Colors.IndexOf(Pointer(PtrUInt(Color)));
     if I > -1 then
     begin
       // Color has already been used
@@ -32267,7 +32267,7 @@ var
     end
     else
     begin
-      I := Colors.Add(Pointer(Color));
+      I := Colors.Add(Pointer(PtrUInt(Color)));
       Buffer.Add('\cf');
       Buffer.Add(IntToStr(I + 1));
       CurrentFontColor := I;
@@ -32521,7 +32521,7 @@ begin
     S := S + '{\colortbl;';
     for I := 0 to Colors.Count - 1 do
     begin
-      J := ColorToRGB(TColor(Colors[I]));
+      J := ColorToRGB(TColor(PtrUInt(Colors[I])));
       S := S + Format('\red%d\green%d\blue%d;', [J and $FF, (J shr 8) and $FF, (J shr 16) and $FF]);
     end;
     S := S + '}';

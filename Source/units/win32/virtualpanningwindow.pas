@@ -41,9 +41,10 @@ begin
     PanningObject:=TVirtualPanningWindow(GetWindowLongPtrW(Window,GWL_USERDATA));
     if Assigned(PanningObject) then
       PanningObject.HandlePaintMessage;
+    Result := 0;
   end
   else
-    DefWindowProc(Window,Msg,WPara,LPara);
+    Result := DefWindowProc(Window,Msg,WPara,LPara);
 end;
 
 var

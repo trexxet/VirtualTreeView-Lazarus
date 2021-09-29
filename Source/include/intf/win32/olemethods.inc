@@ -140,6 +140,7 @@ function TOLEMemoryStream.Write(const Buffer; Count: Integer): Integer;
 begin
   //raise EStreamError.CreateRes(PResStringRec(@SCantWriteResourceStreamError));
   raise EStreamError.Create(SCantWriteResourceStreamError);
+  Result := 0;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
