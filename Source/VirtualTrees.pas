@@ -20768,7 +20768,7 @@ begin
         // VK_BACK temporarily changes search direction to opposite mode.
         if PreviousSearch then
         begin
-          if SearchDirection = sdBackward then
+          if FSearchDirection = sdBackward then
             SearchDirection := sdForward
           else
             SearchDirection := sdBackward
