@@ -31691,10 +31691,9 @@ procedure TBaseVirtualTree.DoGetHintKind(Node: PVirtualNode; Column:
     TColumnIndex; var Kind: TVTHintKind);
 
 begin
+  Kind := DefaultHintKind;
   if Assigned(FOnGetHintKind) then
-    FOnGetHintKind(Self, Node, Column, Kind)
-  else
-    Kind := DefaultHintKind;
+    FOnGetHintKind(Self, Node, Column, Kind);
 end;
 
 function TBaseVirtualTree.GetDefaultHintKind: TVTHintKind;
