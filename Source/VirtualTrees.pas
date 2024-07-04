@@ -16134,9 +16134,9 @@ begin
             begin
               // An owner-draw tree should only display a hint when at least
               // its OnGetHintSize event handler is assigned.
-              DoGetHintKind(HitInfo.HitNode, HitInfo.HitColumn, FHintData.HintKind);
+              DoGetHintKind(HitInfo.HitNode, HitInfo.HitColumn, FHintData.Kind);
               FHintData.HintRect := Rect(0, 0, 0, 0);
-              if (FHintData.HintKind = vhkOwnerDraw) then
+              if (FHintData.Kind = vhkOwnerDraw) then
               begin
                 DoGetHintSize(HitInfo.HitNode, HitInfo.HitColumn, FHintData.HintRect);
                 ShowOwnHint := not IsRectEmpty(FHintData.HintRect);
